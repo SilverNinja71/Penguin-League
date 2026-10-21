@@ -5,11 +5,11 @@ Play 1v1, 2v2 or 5v5 against bots from Easy to God. The bots drive a stock pengu
 
 ## Play
 
-Play online at https://silverninja71.github.io/penguin-league/, or open `index.html`. To share the site account locally, put this repo next to the hub repo [`Empire`](https://github.com/SilverNinja71/Empire) in one folder, run `python3 Empire/server.py` there and go to `http://localhost:8080/penguin-league/`. Three.js and the fonts load from CDNs, so it needs an internet connection.
+Play online at https://silverninja71.github.io/Penguin-League/, or open `index.html`. To share the site account locally, put this repo next to the hub repo [`Empire`](https://github.com/SilverNinja71/Empire) in one folder, run `python3 Empire/server.py` there and go to `http://localhost:8080/Penguin-League/`. Three.js and the fonts load from CDNs, so it needs an internet connection.
 
 ## Play with friends
 
-Press **PLAY WITH FRIENDS** on the title screen, then **CREATE ROOM**, and send the invite link (`…/penguin-league/?room=CODE`) to up to 3 friends. Opening the link joins the room; friends can also type the 5-letter code. The host picks 1v1, 2v2 or 5v5, friends-vs-friends or all-together-vs-bots, the bot level and the match length, and bots fill the empty spots. Everyone drives a stock penguin.
+Press **PLAY WITH FRIENDS** on the title screen, then **CREATE ROOM**, and send the invite link (`…/Penguin-League/?room=CODE`) to up to 3 friends. Opening the link joins the room; friends can also type the 5-letter code. The host picks 1v1, 2v2 or 5v5, friends-vs-friends or all-together-vs-bots, the bot level and the match length, and bots fill the empty spots. Everyone drives a stock penguin.
 
 The match runs on the host's computer, so the host should keep the tab open and in front. Friends send their controls and see the match about 0.1 s behind, which keeps motion smooth. Connections go browser to browser through PeerJS, so it needs an internet connection.
 
