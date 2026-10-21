@@ -1,0 +1,43 @@
+name: Build Verification CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build Penguin League
+        run: sh build.sh
+
+      - name: Verify Penguin League Build Is Committed
+        run: git diff --exit-code -- penguin-league.html index.html
+
+      - name: Penguin League Syntax Check
+        # Pulls the game module out of the built page and parses it (no browser needed).
+        run: |
+          python3 - <<'PY'
+          import re
+          html = open('penguin-league.html', encoding='utf-8').read()
+          m = re.search(r'<script type="module">\n(.*?)\n</script>', html, re.S)
+          if not m:
+              raise SystemExit('No game module found in penguin-league.html')
+          open('/tmp/penguin-league-game.mjs', 'w', encoding='utf-8').write(m.group(1))
+          PY
+          node --check /tmp/penguin-league-game.mjs

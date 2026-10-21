@@ -5,7 +5,7 @@ Play 1v1, 2v2 or 5v5 against bots from Easy to God. The bots drive a stock pengu
 
 ## Play
 
-Open `index.html`, or run `./start.sh` at the repo root and go to `http://localhost:8080/penguin-league/`. Three.js and the fonts load from CDNs, so it needs an internet connection.
+Play online at https://silverninja71.github.io/penguin-league/, or open `index.html`. To share the site account locally, put this repo next to the hub repo [`Empire`](https://github.com/SilverNinja71/Empire) in one folder, run `python3 Empire/server.py` there and go to `http://localhost:8080/penguin-league/`. Three.js and the fonts load from CDNs, so it needs an internet connection.
 
 ## Play with friends
 
