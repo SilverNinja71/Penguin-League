@@ -347,6 +347,8 @@ body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
 #loading .ld-peng{position:relative;width:128px;height:128px;filter:drop-shadow(0 5px 0 rgba(27,29,58,.35));animation:waddle .9s ease-in-out infinite;transform-origin:50% 90%}
 @keyframes waddle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg) translateY(-4px)}}
 #loading.err{background:#ff8a7a}
+#gfx-lost{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(27,29,58,.72);color:#fff;font-family:var(--font-display);font-size:22px;text-shadow:var(--stroke-sm);text-align:center;padding:0 16px}
+#gfx-lost p{margin:0}
 #loading-msg{position:relative}
 
 @media (max-width:900px){

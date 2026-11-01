@@ -347,6 +347,8 @@ body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
 #loading .ld-peng{position:relative;width:128px;height:128px;filter:drop-shadow(0 5px 0 rgba(27,29,58,.35));animation:waddle .9s ease-in-out infinite;transform-origin:50% 90%}
 @keyframes waddle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg) translateY(-4px)}}
 #loading.err{background:#ff8a7a}
+#gfx-lost{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(27,29,58,.72);color:#fff;font-family:var(--font-display);font-size:22px;text-shadow:var(--stroke-sm);text-align:center;padding:0 16px}
+#gfx-lost p{margin:0}
 #loading-msg{position:relative}
 
 @media (max-width:900px){
@@ -1485,9 +1487,16 @@ const gfxPass = new gfxRenderPass(scene, camera);
 const gfxBloom = new gfxUnrealBloomPass(new THREE.Vector2(256, 256), 0.7, 0.25, 1.2);
 // soft-knee *subtractive* bright pass: only the energy above the threshold glows, so a white wall at 1.05 stays crisp
 gfxBloom.highPassUniforms.smoothWidth.value = 0.2;
-gfxBloom.materialHighPassFilter.fragmentShader = `uniform sampler2D tDiffuse; uniform float luminosityThreshold; uniform float smoothWidth; varying vec2 vUv;
+// GFX_SAFE_GLSL: a NaN or Inf pixel (a driver hiccup or a bad normal) becomes 0 instead of turning black and,
+// worse, being smeared across the whole screen by the bloom blur
+const GFX_SAFE_GLSL = `vec3 gfxSafe( vec3 c ) {
+  bvec3 bad = bvec3( isnan( c.r ) || isinf( c.r ), isnan( c.g ) || isinf( c.g ), isnan( c.b ) || isinf( c.b ) );
+  return clamp( vec3( bad.x ? 0.0 : c.r, bad.y ? 0.0 : c.g, bad.z ? 0.0 : c.b ), 0.0, 64.0 );
+}
+`;
+gfxBloom.materialHighPassFilter.fragmentShader = GFX_SAFE_GLSL + `uniform sampler2D tDiffuse; uniform float luminosityThreshold; uniform float smoothWidth; varying vec2 vUv;
   void main(){
-    vec3 c = texture2D(tDiffuse, vUv).rgb;
+    vec3 c = gfxSafe(texture2D(tDiffuse, vUv).rgb);
     float l = max(max(c.r, c.g), c.b);
     float s = clamp(l - luminosityThreshold + smoothWidth, 0.0, 2.0 * smoothWidth);
     s = max(s * s / (4.0 * smoothWidth + 1e-4), l - luminosityThreshold);
@@ -1497,9 +1506,9 @@ gfxBloom.materialHighPassFilter.needsUpdate = true;
 const gfxOut = new gfxShaderPass({
   uniforms: { tDiffuse: { value: null }, uVig: { value: 0.16 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-  fragmentShader: GFX_TONE_GLSL.replace('gfxTone', 'gfxToneP') + `uniform sampler2D tDiffuse; uniform float uVig; varying vec2 vUv;
+  fragmentShader: GFX_SAFE_GLSL + GFX_TONE_GLSL.replace('gfxTone', 'gfxToneP') + `uniform sampler2D tDiffuse; uniform float uVig; varying vec2 vUv;
     void main(){
-      vec3 c = gfxToneP(texture2D(tDiffuse, vUv).rgb);
+      vec3 c = gfxToneP(gfxSafe(texture2D(tDiffuse, vUv).rgb));
       vec2 q = vUv - 0.5; c *= 1.0 - uVig * smoothstep(0.12, 0.5, dot(q, q));
       c = mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
       c += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
@@ -1513,7 +1522,44 @@ function gfxRender(sc, cam) {
   if (save.settings.quality === 'low') { renderer.render(sc, cam); return; }
   gfxPass.scene = sc; gfxPass.camera = cam;
   gfxComposer.render();
+  gfxWatch();
 }
+// Safety net for the High / Auto pipeline. Some browser + GPU combinations can't draw into the multisampled HDR
+// target and output a pure black picture (the HTML HUD still shows on top). About once a second, read five
+// pixels of the finished frame; if two checks in a row see nothing but black, switch to Low, which draws straight
+// to the screen, and say so. The scene always has a bright sky, rink or outlines, so a real frame is never all black.
+const GFXW = { last: 0, bad: 0, px: new Uint8Array(4), pts: [[0.5, 0.5], [0.2, 0.25], [0.8, 0.25], [0.2, 0.8], [0.8, 0.8]] };
+function gfxWatch() {
+  const now = performance.now(); if (now - GFXW.last < 1000) return; GFXW.last = now;
+  const gl = renderer.getContext(); if (gl.isContextLost()) return;
+  renderer.setRenderTarget(null);
+  const w = gl.drawingBufferWidth, h = gl.drawingBufferHeight; let lit = 0;
+  for (const [fx, fy] of GFXW.pts) { gl.readPixels((fx * w) | 0, (fy * h) | 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, GFXW.px); if (GFXW.px[0] + GFXW.px[1] + GFXW.px[2] > 8) lit++; }
+  GFXW.bad = lit ? 0 : GFXW.bad + 1;
+  if (GFXW.bad < 2) return;
+  GFXW.bad = 0;
+  save.settings.quality = 'low'; persist(); applyQuality();
+  const bg = document.getElementById('menu-bg'); if (bg) bg.classList.add('lowq');
+  if (typeof banner === 'function') banner('Graphics set to Low', 'High effects showed a black screen in this browser. You can change it in Settings.', 'yellow', 4);
+}
+// If the browser resets the GPU (sleep, driver update, too many tabs), three.js rebuilds its state on
+// 'webglcontextrestored'; re-apply sizes and materials then. If it doesn't come back, offer a reload.
+let gfxLostTimer = 0;
+canvas.addEventListener('webglcontextlost', () => {
+  clearTimeout(gfxLostTimer);
+  gfxLostTimer = setTimeout(() => {
+    if (!renderer.getContext().isContextLost() || document.getElementById('gfx-lost')) return;
+    const d = document.createElement('div'); d.id = 'gfx-lost';
+    d.innerHTML = '<p>Your browser paused the 3D graphics.</p><button class="btn yellow" type="button">Reload</button>';
+    d.querySelector('button').addEventListener('click', () => location.reload());
+    document.body.appendChild(d);
+  }, 3000);
+});
+canvas.addEventListener('webglcontextrestored', () => {
+  clearTimeout(gfxLostTimer);
+  const d = document.getElementById('gfx-lost'); if (d) d.remove();
+  applyQuality();
+});
 // draws the main game scene for one frame
 function renderMain() { gfxRender(scene, camera); }
 function canvasTex(w, h, draw) {
