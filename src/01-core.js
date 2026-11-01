@@ -77,6 +77,58 @@ const BOT_NAMES = ['Waddles', 'Pebble', 'Noot', 'Flapjack', 'Frosty', 'Skipper',
   'Biscuit', 'Blizzard', 'Sardine', 'Krill Bill', 'Gloop', 'Slushie', 'Captain Floe', 'Sir Slides', 'Belly Bob', 'Toboggan',
   'Dr. Fish', 'Squawk', 'Glacier', 'Marshmallow', 'Cobbler', 'Popsicle', 'Nugget', 'Sleet', 'Kelp', 'Drift'];
 
+// ----------------------------------------------------------- platform: CrazyGames SDK v3
+// Only the CrazyGames build loads the SDK (it sets window.PL_SDK_READY in the page head, see
+// src/crazygames-head.html). Everywhere else, and when an ad blocker stops the SDK, every call here does nothing.
+const PL_OFFLINE = !!window.PL_OFFLINE;   // CrazyGames build: no online rooms, so no outside servers at all
+const Platform = await (async () => {
+  let sdk = null;
+  if (window.PL_SDK_READY) sdk = await Promise.race([window.PL_SDK_READY, new Promise((r) => setTimeout(() => r(null), 6000))]);
+  const on = !!sdk;
+  const call = (f) => { if (!on) return; try { f(sdk); } catch (e) { console.warn('CrazyGames SDK:', e); } };
+  let playing = false, inAd = false, sdkMute = false, dataOk = on;
+  const muteListeners = [];
+  const tellMute = () => { for (const f of muteListeners) f(); };
+  const readMute = () => { sdkMute = !!(on && sdk.game.settings && sdk.game.settings.muteAudio); tellMute(); };
+  if (on) { readMute(); call((s) => s.game.addSettingsChangeListener(readMute)); }
+  return {
+    on,
+    get inAd() { return inAd; },
+    // the SDK's mute setting outranks the in-game volume slider; ads mute the game too
+    get silent() { return sdkMute || inAd; },
+    onMute(f) { muteListeners.push(f); },
+    loadingStop() { call((s) => s.game.loadingStop()); },
+    // true while the player is actually playing (match running, not paused, not on a menu)
+    gameplay(now) { if (now === playing) return; playing = now; call((s) => (now ? s.game.gameplayStart() : s.game.gameplayStop())); },
+    happytime() { call((s) => s.game.happytime()); },
+    // midgame ad between matches. `then` runs exactly once: after the ad, on any ad error (cooldown, no fill,
+    // ad blocker), or if the SDK never answers, so a broken ad can never strand the player on a menu
+    adBreak(then) {
+      if (!on) { then(); return; }
+      let done = false, started = false;
+      const fin = () => { if (done) return; done = true; inAd = false; tellMute(); then(); };
+      try {
+        sdk.ad.requestAd('midgame', {
+          adStarted: () => { started = true; inAd = true; tellMute(); },
+          adFinished: fin, adError: fin,
+        });
+      } catch (e) { fin(); return; }
+      setTimeout(() => { if (!started) fin(); }, 5000);
+      setTimeout(fin, 120000);
+    },
+    // save storage: the SDK's Data module (cloud saves for signed-in players) when it is switched on,
+    // with the browser's localStorage as the fallback and backup
+    getItem(k) {
+      if (dataOk) { try { const v = sdk.data.getItem(k); if (typeof v === 'string') return v; } catch (e) { dataOk = false; } }
+      try { return localStorage.getItem(k); } catch (e) { return null; }
+    },
+    setItem(k, v) {
+      if (dataOk) { try { sdk.data.setItem(k, v); } catch (e) { dataOk = false; } }
+      try { localStorage.setItem(k, v); } catch (e) { /* storage blocked */ }
+    },
+  };
+})();
+
 // ----------------------------------------------------------- save file (per-viewer, browser storage)
 const SAVE_KEY = 'penguin-league-save-v1';
 const DEFAULT_SAVE = {
@@ -92,6 +144,7 @@ const DEFAULT_SAVE = {
   career: { played: 0, wins: 0, goals: 0, godWins: 0 },
   last: { mode: '1v1', opp: 'normal', mate: 'normal', len: 300, fair: false },
   netName: '',   // name shown to friends online ('' = the shared account's username)
+  tutorial: 0,   // 1 once the first-time tutorial was finished or skipped
 };
 function deepMerge(base, src) {
   for (const k in src) {
@@ -103,13 +156,14 @@ function deepMerge(base, src) {
 }
 function loadSave() {
   const fresh = JSON.parse(JSON.stringify(DEFAULT_SAVE));
-  try { const raw = localStorage.getItem(SAVE_KEY); if (raw) return deepMerge(fresh, JSON.parse(raw)); } catch (e) { /* storage blocked */ }
+  try { const raw = Platform.getItem(SAVE_KEY); if (raw) return deepMerge(fresh, JSON.parse(raw)); } catch (e) { /* storage blocked or bad data */ }
   return fresh;
 }
 const save = loadSave();
 if (!save.settings.v2) { if (save.settings.fov === 100) save.settings.fov = 110; save.settings.v2 = true; }
 if (save.settings.fov > 110) save.settings.fov = 110;   // Rocket League's maximum
-function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* storage blocked */ } }
+if (save.career.played > 0) save.tutorial = 1;   // saves from before the tutorial existed already know the game
+function persist() { Platform.setItem(SAVE_KEY, JSON.stringify(save)); }
 
 // ----------------------------------------------------------- audio (synthesised, starts after first click)
 // Cartoon penguin sound set: bubbles and glugs instead of coin dings, rubbery
@@ -117,13 +171,14 @@ function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save));
 const Sfx = (() => {
   let ctx = null, master = null, noiseBuf = null, boostG = null, slideG = null, slideF = null, crowdG = null;
   const ok = () => !!(ctx && master);
+  const gainNow = () => (Platform.silent ? 0 : save.settings.volume);
   function init() {
     if (/mute/.test(location.hash)) return;   // testing: #mute keeps the page silent
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
     try { ctx = new AC(); } catch (e) { ctx = null; return; }
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; comp.connect(ctx.destination);
-    master = ctx.createGain(); master.gain.value = save.settings.volume; master.connect(comp);
+    master = ctx.createGain(); master.gain.value = gainNow(); master.connect(comp);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     const loop = (type, freq, q) => {
@@ -192,7 +247,7 @@ const Sfx = (() => {
   };
   return {
     init,
-    setVolume(v) { if (master) master.gain.value = v; },
+    setVolume() { if (master) master.gain.value = gainNow(); },
     // rubbery beach-ball "boink", with a whoosh on big hits
     hit(p) {
       const k = clamp(p / 35, 0.08, 1);
@@ -247,3 +302,4 @@ const Sfx = (() => {
     },
   };
 })();
+Platform.onMute(() => Sfx.setVolume());

@@ -111,6 +111,7 @@ function startMatch(cfg) {
     }
   }
   else for (const team of [0, 1]) {
+    if (cfg.tutorial && team === 1) continue;   // the tutorial rink is empty apart from you and the ball
     for (let i = 0; i < n; i++) {
       let car;
       if (team === 0 && i === 0 && !M.demo) {
@@ -484,13 +485,14 @@ const HUD = (() => {
   return {
     reset() {
       $('#feed').innerHTML = ''; $('#toasts').innerHTML = ''; $('#banner').innerHTML = '';
-      hintT = save.settings.hints ? 14 : 0; hint.style.opacity = hintT > 0 ? 1 : 0; hint.hidden = hintT <= 0;
+      hintT = save.settings.hints && !M.cfg.tutorial ? 14 : 0; hint.style.opacity = hintT > 0 ? 1 : 0; hint.hidden = hintT <= 0;
       $('#touch').hidden = !document.body.classList.contains('touch');
+      el.classList.toggle('tut', !!M.cfg.tutorial);
       this.camChip(); lastBoost = -1; lastClock = ''; lastCharge = -1; lastBurst = null; chargeFull = false;
       lastS0 = lastS1 = lastSpeed = -1; lastArrow = '';
       s0.textContent = '0'; s1.textContent = '0';
     },
-    camChip() { chip.setAttribute('aria-pressed', save.settings.ballCam ? 'true' : 'false'); chip.textContent = `BALL CAM ${save.settings.ballCam ? 'ON' : 'OFF'} · C`; },
+    camChip() { chip.setAttribute('aria-pressed', save.settings.ballCam ? 'true' : 'false'); chip.textContent = `BALL CAM ${save.settings.ballCam ? 'ON' : 'OFF'} · ${kl('KeyC')}`; },
     bumpScore(team) { const e = team ? s1 : s0; e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); },
     scoreboard(on) {
       if (!inMatch()) { sb.hidden = true; return; }
@@ -500,7 +502,7 @@ const HUD = (() => {
       if (!inMatch()) return;
       if (M.score[0] !== lastS0) { lastS0 = M.score[0]; s0.textContent = lastS0; }
       if (M.score[1] !== lastS1) { lastS1 = M.score[1]; s1.textContent = lastS1; }
-      const ct = M.overtime ? fmtUp(M.otTime) : fmtClock(M.clock);
+      const ct = M.cfg.tutorial ? 'PRACTICE' : M.overtime ? fmtUp(M.otTime) : fmtClock(M.clock);
       if (ct !== lastClock) { time.textContent = ct; lastClock = ct; ot.hidden = !M.overtime; }
       const p = M.player;
       const bv = Math.round(p.boost);
@@ -576,6 +578,9 @@ function frame(now) {
   requestAnimationFrame(frame);
   let dt = (now - lastFrame) / 1000; lastFrame = now;
   if (dt > 0.25) dt = 0.25; if (dt < 0) dt = 0;
+  // CrazyGames: gameplay is on while a match runs unpaused (the tutorial counts); nothing runs during an ad
+  Platform.gameplay(inMatch() && !M.paused && M.state !== 'over' && UI.cur !== 'pause' && !Platform.inAd);
+  if (Platform.inAd) return;
   pollPad();
   if (M.demo && !UI.showroomOn()) {
     demoAcc += dt;

@@ -32,3 +32,6 @@ venv/
 *.log
 test_*.js
 scratch/
+
+# CrazyGames upload, made by build.sh
+dist/

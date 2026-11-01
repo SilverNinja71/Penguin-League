@@ -36,6 +36,20 @@ On touch screens there are on-screen JUMP, BOOST, SLIDE and SHOT buttons.
 - **Goal highlight:** every goal plays 2.5 s of 0.35× slow motion with the camera zooming toward the net and the scorer, an air horn and confetti, then the kickoff resets.
 - **Team roles:** each team has a Goalie, a Sweeper in 5v5, and Strikers. Only the lead striker chases the ball, duties swap as play moves, and badges over bot names show who is doing what.
 
+## CrazyGames build
+
+`./build.sh` also makes `dist/crazygames/` and `dist/penguin-league-crazygames.zip`, the file to upload to CrazyGames (about 0.4 MB). That version:
+
+- loads Three.js r160, its post-processing add-ons and the fonts from its own files (`vendor/`), not from CDNs;
+- adds the CrazyGames HTML5 SDK v3: loading start/stop, gameplay start/stop around play (pauses and menus stop it), midgame ads only between matches with the game muted during them, the SDK's mute setting, `happytime` for a first God-bot win, and saves through the SDK Data module, with localStorage as the fallback;
+- leaves out online rooms (PeerJS), so it talks to no server except CrazyGames' own SDK. The build stops if any other outside address is left in the page.
+
+Everywhere else the SDK isn't loaded and none of this runs. To test it locally, serve the repo folder (for example `python3 -m http.server`) and open `/dist/crazygames/index.html#mute`. The SDK then runs in its "local" mode and shows a placeholder where an ad would be.
+
+## First minute
+
+**PLAY** on the title screen is one click into gameplay. First-time players get a five-step tutorial in an empty rink (drive, boost, jump, hit the ball, score), which they can skip, followed by a 3-minute 1v1 against an Easy bot. After that, PLAY goes straight to that quick match, and **Custom match** opens the full setup. The control card in matches and the tutorial follow the device being used (keyboard, gamepad or touch), and key names follow the keyboard layout where the browser reports it (Z Q S D on AZERTY).
+
 ## Build
 
 The game is split into parts in `src/`. `./build.sh` joins them into `index.html` (standalone page) and `penguin-league.html` (page body for publishing elsewhere). `tools/check.sh` builds and syntax-checks the result with macOS JavaScriptCore.

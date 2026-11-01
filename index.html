@@ -136,7 +136,8 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:4px so
 @keyframes bob{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(-2.5deg) translateY(-8px)}}
 .title-mid{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:max(5vh,40px)}
 .title-actions{display:flex;flex-direction:column;align-items:center;gap:max(26px,min(30px,4vh));margin-bottom:1vh;padding-top:16px}
-.title-actions .row{display:flex;flex-wrap:wrap;justify-content:center;gap:30px 16px}
+.title-actions .row{display:flex;flex-wrap:wrap;justify-content:center;gap:30px 12px}
+.title-actions .row .btn{padding-left:.8em;padding-right:.8em}
 .career{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .career .stat{background:linear-gradient(180deg,#fff,#dcf2ff);border:3px solid var(--ink);border-radius:12px;padding:6px 12px;font-weight:600;font-size:14px;box-shadow:0 3px 0 var(--ink)}
 .career .stat b{font-family:var(--font-display);font-weight:400;font-size:18px;margin-right:4px}
@@ -340,7 +341,23 @@ table.stats tr.me td{background:rgba(255,226,110,.55);font-weight:700}
 #t-shot{--c1:#c8f6ff;--c2:#2fb8ff;right:calc(34px + env(safe-area-inset-right,0px));bottom:calc(254px + env(safe-area-inset-bottom,0px));width:64px;height:64px;font-size:13px}
 body.touch #boost{bottom:auto;top:calc(76px + env(safe-area-inset-top,0px));width:84px}
 body.touch #charge{bottom:auto;top:calc(172px + env(safe-area-inset-top,0px));width:84px}
-body.touch #hint{display:none}
+body.touch #hint{font-size:12px;line-height:1.5;max-width:min(330px,46vw)}
+#hud.tut #sb-time{font-size:.6em;letter-spacing:.04em}
+/* first-time tutorial card (top centre, under the scorebug) */
+#tut{position:absolute;left:50%;top:calc(98px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:min(430px,calc(100% - 150px));pointer-events:auto;background:var(--frost);border:3px solid var(--ink);border-radius:16px;box-shadow:0 5px 0 var(--ink);padding:9px 14px 12px;text-align:center;font-family:var(--font-body);color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:6px}
+#tut .tut-top{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px}
+#tut .tut-step{font-family:var(--font-display);font-size:13px;letter-spacing:.1em;color:var(--muted)}
+#tut .tut-title{font-family:var(--font-display);font-size:clamp(22px,3vw,30px);line-height:1.05}
+#tut.pass .tut-title{color:var(--lime-deep)}
+#tut .tut-do{font-weight:600;font-size:15px;line-height:1.6}
+#tut .tut-tip{font-weight:600;font-size:13px;line-height:1.5;color:var(--ink-soft)}
+#tut b.o{color:var(--orange-deep)}
+#tut .tut-dots{display:flex;gap:6px;margin-top:2px}
+#tut .tut-dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);background:#fff}
+#tut .tut-dots i.cur{background:var(--sun)}
+#tut .tut-dots i.on{background:var(--lime)}
+#tut.end{gap:8px;padding:12px 16px 16px}
+@media (max-height:520px){#tut{top:calc(70px + env(safe-area-inset-top,0px));padding:6px 10px 8px;gap:3px}#tut .tut-title{font-size:20px}#tut .tut-do{font-size:13px;line-height:1.5}#tut .btn.sm{padding:.5em .7em .4em}}
 body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
 
 /* loading */
@@ -390,7 +407,20 @@ body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
 }
 
 /* Play with friends: lobby */
-.friends-btn{margin-top:10px;font-size:20px;padding:10px 26px}
+.friends-btn{font-size:20px;padding:10px 26px}
+.quick{display:flex;flex-direction:column;align-items:center;gap:42px}   /* clears the icicles under the big button */
+.quick-sub{color:#fff;font-weight:600;font-size:15px;text-shadow:0 1px 0 var(--ink),0 0 6px rgba(18,86,200,.6)}
+/* short screens (CrazyGames' smallest frame is 800x450): everything on the title screen fits without scrolling */
+@media (max-height:560px){
+  #scr-title .topbar{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));width:auto}
+  #scr-title .tagline,#scr-title .career{display:none}
+  .title-mid{margin-top:0}
+  .logo .l1{font-size:min(15vh,12vw)} .logo .l2{font-size:min(12vh,10vw)}
+  .title-actions{gap:12px;padding-top:4px}
+  .title-actions .btn.big{font-size:30px}
+  .quick{gap:40px}
+  .title-actions .row{gap:20px 10px}
+}
 .net-input{font:600 18px var(--font-body);color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:12px;padding:8px 12px;min-width:0;width:min(320px,100%)}
 .net-input.code{width:9ch;text-transform:uppercase;letter-spacing:.2em;font-family:var(--font-display);font-size:22px}
 .net-input.link{flex:1;width:auto;font-size:14px}
@@ -450,7 +480,7 @@ body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
     <div id="charge" aria-hidden="true"><i></i><b>POWER</b></div>
     <div id="hud-left">
       <button id="chip-ballcam" class="hud-chip" type="button" aria-pressed="true">BALL CAM ON · C</button>
-      <div id="hint"><kbd>W A S D</kbd> drive &nbsp;<kbd>Space</kbd> jump/dive &nbsp;<kbd>Shift</kbd> boost<br><kbd>F</kbd> hold for a charged shot &nbsp;<kbd>X</kbd> powerslide &nbsp;<kbd>C</kbd> ball cam &nbsp;<kbd>Esc</kbd> pause</div>
+      <div id="hint"></div>
     </div>
     <button id="btn-pause" type="button" aria-label="Pause"></button>
     <div id="touch" hidden>
@@ -460,6 +490,7 @@ body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
       <div class="tbtn" id="t-slide">SLIDE</div>
       <div class="tbtn" id="t-shot">SHOT</div>
     </div>
+    <div id="tut" hidden></div>
   </div>
   <div id="menu">
     <div id="menu-bg"><div class="snow s1"></div><div class="snow s2"></div></div>
@@ -562,6 +593,58 @@ const BOT_NAMES = ['Waddles', 'Pebble', 'Noot', 'Flapjack', 'Frosty', 'Skipper',
   'Biscuit', 'Blizzard', 'Sardine', 'Krill Bill', 'Gloop', 'Slushie', 'Captain Floe', 'Sir Slides', 'Belly Bob', 'Toboggan',
   'Dr. Fish', 'Squawk', 'Glacier', 'Marshmallow', 'Cobbler', 'Popsicle', 'Nugget', 'Sleet', 'Kelp', 'Drift'];
 
+// ----------------------------------------------------------- platform: CrazyGames SDK v3
+// Only the CrazyGames build loads the SDK (it sets window.PL_SDK_READY in the page head, see
+// src/crazygames-head.html). Everywhere else, and when an ad blocker stops the SDK, every call here does nothing.
+const PL_OFFLINE = !!window.PL_OFFLINE;   // CrazyGames build: no online rooms, so no outside servers at all
+const Platform = await (async () => {
+  let sdk = null;
+  if (window.PL_SDK_READY) sdk = await Promise.race([window.PL_SDK_READY, new Promise((r) => setTimeout(() => r(null), 6000))]);
+  const on = !!sdk;
+  const call = (f) => { if (!on) return; try { f(sdk); } catch (e) { console.warn('CrazyGames SDK:', e); } };
+  let playing = false, inAd = false, sdkMute = false, dataOk = on;
+  const muteListeners = [];
+  const tellMute = () => { for (const f of muteListeners) f(); };
+  const readMute = () => { sdkMute = !!(on && sdk.game.settings && sdk.game.settings.muteAudio); tellMute(); };
+  if (on) { readMute(); call((s) => s.game.addSettingsChangeListener(readMute)); }
+  return {
+    on,
+    get inAd() { return inAd; },
+    // the SDK's mute setting outranks the in-game volume slider; ads mute the game too
+    get silent() { return sdkMute || inAd; },
+    onMute(f) { muteListeners.push(f); },
+    loadingStop() { call((s) => s.game.loadingStop()); },
+    // true while the player is actually playing (match running, not paused, not on a menu)
+    gameplay(now) { if (now === playing) return; playing = now; call((s) => (now ? s.game.gameplayStart() : s.game.gameplayStop())); },
+    happytime() { call((s) => s.game.happytime()); },
+    // midgame ad between matches. `then` runs exactly once: after the ad, on any ad error (cooldown, no fill,
+    // ad blocker), or if the SDK never answers, so a broken ad can never strand the player on a menu
+    adBreak(then) {
+      if (!on) { then(); return; }
+      let done = false, started = false;
+      const fin = () => { if (done) return; done = true; inAd = false; tellMute(); then(); };
+      try {
+        sdk.ad.requestAd('midgame', {
+          adStarted: () => { started = true; inAd = true; tellMute(); },
+          adFinished: fin, adError: fin,
+        });
+      } catch (e) { fin(); return; }
+      setTimeout(() => { if (!started) fin(); }, 5000);
+      setTimeout(fin, 120000);
+    },
+    // save storage: the SDK's Data module (cloud saves for signed-in players) when it is switched on,
+    // with the browser's localStorage as the fallback and backup
+    getItem(k) {
+      if (dataOk) { try { const v = sdk.data.getItem(k); if (typeof v === 'string') return v; } catch (e) { dataOk = false; } }
+      try { return localStorage.getItem(k); } catch (e) { return null; }
+    },
+    setItem(k, v) {
+      if (dataOk) { try { sdk.data.setItem(k, v); } catch (e) { dataOk = false; } }
+      try { localStorage.setItem(k, v); } catch (e) { /* storage blocked */ }
+    },
+  };
+})();
+
 // ----------------------------------------------------------- save file (per-viewer, browser storage)
 const SAVE_KEY = 'penguin-league-save-v1';
 const DEFAULT_SAVE = {
@@ -577,6 +660,7 @@ const DEFAULT_SAVE = {
   career: { played: 0, wins: 0, goals: 0, godWins: 0 },
   last: { mode: '1v1', opp: 'normal', mate: 'normal', len: 300, fair: false },
   netName: '',   // name shown to friends online ('' = the shared account's username)
+  tutorial: 0,   // 1 once the first-time tutorial was finished or skipped
 };
 function deepMerge(base, src) {
   for (const k in src) {
@@ -588,13 +672,14 @@ function deepMerge(base, src) {
 }
 function loadSave() {
   const fresh = JSON.parse(JSON.stringify(DEFAULT_SAVE));
-  try { const raw = localStorage.getItem(SAVE_KEY); if (raw) return deepMerge(fresh, JSON.parse(raw)); } catch (e) { /* storage blocked */ }
+  try { const raw = Platform.getItem(SAVE_KEY); if (raw) return deepMerge(fresh, JSON.parse(raw)); } catch (e) { /* storage blocked or bad data */ }
   return fresh;
 }
 const save = loadSave();
 if (!save.settings.v2) { if (save.settings.fov === 100) save.settings.fov = 110; save.settings.v2 = true; }
 if (save.settings.fov > 110) save.settings.fov = 110;   // Rocket League's maximum
-function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* storage blocked */ } }
+if (save.career.played > 0) save.tutorial = 1;   // saves from before the tutorial existed already know the game
+function persist() { Platform.setItem(SAVE_KEY, JSON.stringify(save)); }
 
 // ----------------------------------------------------------- audio (synthesised, starts after first click)
 // Cartoon penguin sound set: bubbles and glugs instead of coin dings, rubbery
@@ -602,13 +687,14 @@ function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save));
 const Sfx = (() => {
   let ctx = null, master = null, noiseBuf = null, boostG = null, slideG = null, slideF = null, crowdG = null;
   const ok = () => !!(ctx && master);
+  const gainNow = () => (Platform.silent ? 0 : save.settings.volume);
   function init() {
     if (/mute/.test(location.hash)) return;   // testing: #mute keeps the page silent
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
     try { ctx = new AC(); } catch (e) { ctx = null; return; }
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; comp.connect(ctx.destination);
-    master = ctx.createGain(); master.gain.value = save.settings.volume; master.connect(comp);
+    master = ctx.createGain(); master.gain.value = gainNow(); master.connect(comp);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     const loop = (type, freq, q) => {
@@ -677,7 +763,7 @@ const Sfx = (() => {
   };
   return {
     init,
-    setVolume(v) { if (master) master.gain.value = v; },
+    setVolume() { if (master) master.gain.value = gainNow(); },
     // rubbery beach-ball "boink", with a whoosh on big hits
     hit(p) {
       const k = clamp(p / 35, 0.08, 1);
@@ -732,6 +818,7 @@ const Sfx = (() => {
     },
   };
 })();
+Platform.onMute(() => Sfx.setVolume());
 // =====================================================================
 //  PHYSICS — arena distance field, ball, penguins, collisions, pads
 //  Units are metres and seconds, scaled from the classic car-soccer numbers
@@ -6235,6 +6322,7 @@ function startMatch(cfg) {
     }
   }
   else for (const team of [0, 1]) {
+    if (cfg.tutorial && team === 1) continue;   // the tutorial rink is empty apart from you and the ball
     for (let i = 0; i < n; i++) {
       let car;
       if (team === 0 && i === 0 && !M.demo) {
@@ -6608,13 +6696,14 @@ const HUD = (() => {
   return {
     reset() {
       $('#feed').innerHTML = ''; $('#toasts').innerHTML = ''; $('#banner').innerHTML = '';
-      hintT = save.settings.hints ? 14 : 0; hint.style.opacity = hintT > 0 ? 1 : 0; hint.hidden = hintT <= 0;
+      hintT = save.settings.hints && !M.cfg.tutorial ? 14 : 0; hint.style.opacity = hintT > 0 ? 1 : 0; hint.hidden = hintT <= 0;
       $('#touch').hidden = !document.body.classList.contains('touch');
+      el.classList.toggle('tut', !!M.cfg.tutorial);
       this.camChip(); lastBoost = -1; lastClock = ''; lastCharge = -1; lastBurst = null; chargeFull = false;
       lastS0 = lastS1 = lastSpeed = -1; lastArrow = '';
       s0.textContent = '0'; s1.textContent = '0';
     },
-    camChip() { chip.setAttribute('aria-pressed', save.settings.ballCam ? 'true' : 'false'); chip.textContent = `BALL CAM ${save.settings.ballCam ? 'ON' : 'OFF'} · C`; },
+    camChip() { chip.setAttribute('aria-pressed', save.settings.ballCam ? 'true' : 'false'); chip.textContent = `BALL CAM ${save.settings.ballCam ? 'ON' : 'OFF'} · ${kl('KeyC')}`; },
     bumpScore(team) { const e = team ? s1 : s0; e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); },
     scoreboard(on) {
       if (!inMatch()) { sb.hidden = true; return; }
@@ -6624,7 +6713,7 @@ const HUD = (() => {
       if (!inMatch()) return;
       if (M.score[0] !== lastS0) { lastS0 = M.score[0]; s0.textContent = lastS0; }
       if (M.score[1] !== lastS1) { lastS1 = M.score[1]; s1.textContent = lastS1; }
-      const ct = M.overtime ? fmtUp(M.otTime) : fmtClock(M.clock);
+      const ct = M.cfg.tutorial ? 'PRACTICE' : M.overtime ? fmtUp(M.otTime) : fmtClock(M.clock);
       if (ct !== lastClock) { time.textContent = ct; lastClock = ct; ot.hidden = !M.overtime; }
       const p = M.player;
       const bv = Math.round(p.boost);
@@ -6700,6 +6789,9 @@ function frame(now) {
   requestAnimationFrame(frame);
   let dt = (now - lastFrame) / 1000; lastFrame = now;
   if (dt > 0.25) dt = 0.25; if (dt < 0) dt = 0;
+  // CrazyGames: gameplay is on while a match runs unpaused (the tutorial counts); nothing runs during an ad
+  Platform.gameplay(inMatch() && !M.paused && M.state !== 'over' && UI.cur !== 'pause' && !Platform.inAd);
+  if (Platform.inAd) return;
   pollPad();
   if (M.demo && !UI.showroomOn()) {
     demoAcc += dt;
@@ -7166,6 +7258,116 @@ const Online = (() => {
   };
 })();
 // =====================================================================
+//  FIRST MINUTE — control hints that follow the player's device (keyboard,
+//  gamepad or touch), key names for their keyboard layout, and the short
+//  first-time tutorial (skippable) that leads into a Quick Play match
+// =====================================================================
+
+// ---------- which controls the player is using right now (hints follow it)
+let inputDev = document.body.classList.contains('touch') ? 'touch' : 'kb';
+const DEV_HOOKS = [];
+function setDev(d) { if (d === inputDev) return; inputDev = d; for (const f of DEV_HOOKS) f(); }
+addEventListener('keydown', () => setDev('kb'), true);
+addEventListener('pointerdown', (e) => setDev(e.pointerType === 'touch' && document.body.classList.contains('touch') ? 'touch' : 'kb'), true);
+
+// ---------- key names: the game reads physical keys (W is where W sits on a QWERTY board), so on AZERTY the
+// same keys are Z Q S D. Chrome and Edge can tell us what is printed on them; elsewhere QWERTY names show.
+const KEY_LABEL = { KeyW: 'W', KeyA: 'A', KeyS: 'S', KeyD: 'D', KeyF: 'F', KeyX: 'X', KeyC: 'C', KeyP: 'P' };
+const kl = (code) => KEY_LABEL[code] || code;
+try {
+  if (navigator.keyboard && navigator.keyboard.getLayoutMap) {
+    navigator.keyboard.getLayoutMap().then((m) => {
+      for (const c in KEY_LABEL) { const v = m.get(c); if (v && v.length === 1) KEY_LABEL[c] = v.toUpperCase(); }
+      for (const f of DEV_HOOKS) f();
+    }).catch(() => {});
+  }
+} catch (e) { /* not allowed in this frame */ }
+
+// ---------- the in-match control card (bottom left, first seconds of a match)
+function hintHTML(dev) {
+  if (dev === 'pad') return '<kbd>RT</kbd> <kbd>LT</kbd> drive &nbsp;<kbd>Left stick</kbd> steer &nbsp;<kbd>A</kbd> jump/dive &nbsp;<kbd>B</kbd> boost<br><kbd>RB</kbd> hold for a charged shot &nbsp;<kbd>X</kbd> powerslide &nbsp;<kbd>Y</kbd> ball cam &nbsp;<kbd>Start</kbd> pause';
+  if (dev === 'touch') return '<b>Stick</b> drive and steer &nbsp;<b>JUMP</b> jump/dive &nbsp;<b>BOOST</b> jetpack<br><b>SHOT</b> hold for a charged shot &nbsp;<b>SLIDE</b> powerslide';
+  return `<kbd>${kl('KeyW')} ${kl('KeyA')} ${kl('KeyS')} ${kl('KeyD')}</kbd> drive &nbsp;<kbd>Space</kbd> jump/dive &nbsp;<kbd>Shift</kbd> boost<br><kbd>${kl('KeyF')}</kbd> hold for a charged shot &nbsp;<kbd>${kl('KeyX')}</kbd> powerslide &nbsp;<kbd>${kl('KeyC')}</kbd> ball cam &nbsp;<kbd>${kl('KeyP')}</kbd> pause`;
+}
+function renderHint() { $('#hint').innerHTML = hintHTML(inputDev); }
+DEV_HOOKS.push(renderHint);
+renderHint();
+
+// ---------- first-time tutorial: five quick goals in an empty rink, then a real match
+const Tut = (() => {
+  const box = $('#tut');
+  const SCORE = 'Knock the ball into the <b class="o">orange goal</b>';
+  const STEPS = [
+    { t: 'Slide forward', kb: () => `Hold <kbd>${kl('KeyW')}</kbd>`, pad: 'Hold <kbd>RT</kbd>', touch: 'Push the stick up', done: (s) => s.dist > 12 },
+    { t: 'Jetpack boost', kb: 'Hold <kbd>Shift</kbd> or the left mouse button', pad: 'Hold <kbd>B</kbd>', touch: 'Hold <b>BOOST</b>', done: (s) => s.boostT > 0.5 },
+    { t: 'Jump', kb: 'Press <kbd>Space</kbd> (again in the air to dive)', pad: 'Press <kbd>A</kbd> (again in the air to dive)', touch: 'Tap <b>JUMP</b>', done: (s) => s.jumps > 0 },
+    { t: 'Bonk the ball', kb: () => `Steer with <kbd>${kl('KeyA')}</kbd> <kbd>${kl('KeyD')}</kbd> and slide into it`, pad: 'Steer with the left stick and slide into it', touch: 'Steer with the stick and slide into it', done: (s) => s.touches > 0 },
+    { t: 'Score a goal', kb: SCORE, pad: SCORE, touch: SCORE, done: (s) => s.goals > 0 },
+  ];
+  const TIP = { kb: () => `Tip: hold <kbd>${kl('KeyF')}</kbd> as you reach the ball for a power shot`, pad: 'Tip: hold <kbd>RB</kbd> as you reach the ball for a power shot', touch: 'Tip: hold <b>SHOT</b> as you reach the ball for a power shot' };
+  let on = false, step = 0, base = null, stepT = 0, pass = 0, endT = 0;
+  const cur = { dist: 0, boostT: 0, jumps: 0, touches: 0, goals: 0 };
+  const txt = (v) => (typeof v === 'function' ? v() : v);
+  function rebase() {
+    base = { jumps: PRESSES.jump, touches: M.player ? M.player.stat.touches : 0, goals: M.score[0] };
+    cur.dist = 0; cur.boostT = 0; stepT = 0;
+  }
+  function render() {
+    if (!on) { box.hidden = true; return; }
+    box.hidden = false;
+    if (step >= STEPS.length) {
+      box.className = 'end';
+      box.innerHTML = `<div class="tut-title">Nice goal! You're ready.</div>
+        <div class="tut-do">Next up: a 3 minute 1v1 against an Easy bot.</div>
+        <button class="btn green" data-tut-play type="button">PLAY A MATCH${endT > 0 ? ` (${Math.ceil(endT)})` : ''}</button>`;
+      return;
+    }
+    const S = STEPS[step];
+    box.className = pass > 0 ? 'pass' : '';
+    box.innerHTML = `<div class="tut-top"><span class="tut-step">TUTORIAL ${step + 1} / ${STEPS.length}</span><button class="btn white sm" data-tut-skip type="button">Skip</button></div>
+      <div class="tut-title">${pass > 0 ? '✓ ' : ''}${S.t}</div>
+      <div class="tut-do">${txt(S[inputDev])}</div>
+      ${step === STEPS.length - 1 && stepT > 25 ? `<div class="tut-tip">${txt(TIP[inputDev])}</div>` : ''}
+      <div class="tut-dots">${STEPS.map((_, i) => `<i class="${i < step || (i === step && pass > 0) ? 'on' : i === step ? 'cur' : ''}"></i>`).join('')}</div>`;
+  }
+  function start() {
+    on = true; step = 0; pass = 0; endT = 0;
+    UI.launch({ mode: '1v1', opp: 'easy', mate: 'easy', len: 1e9, tutorial: true });
+    rebase(); render();
+  }
+  function stop() { on = false; render(); }
+  function finish() { if (!save.tutorial) { save.tutorial = 1; persist(); } }
+  FRAME_HOOKS.push((fdt) => {
+    if (PAD.on && (PAD.prev.some((x) => x) || Math.abs(PAD.axes[0]) > 0.4 || Math.abs(PAD.axes[1]) > 0.4)) setDev('pad');
+    if (!on) return;
+    if (!M.cfg || !M.cfg.tutorial || M.demo) { stop(); return; }   // quit to the menu from the pause screen
+    if (step >= STEPS.length) {
+      if (endT > 0 && !M.paused) {
+        const before = Math.ceil(endT); endT -= fdt;
+        if (endT <= 0) { stop(); UI.quick(); return; }
+        if (Math.ceil(endT) !== before) render();
+      }
+      return;
+    }
+    if (pass > 0) { pass -= fdt; if (pass <= 0) { step++; rebase(); if (step >= STEPS.length) { finish(); endT = 8; } render(); } return; }
+    if (M.state !== 'play' && M.state !== 'goal') return;
+    const p = M.player;
+    cur.dist += Math.hypot(p.v.x, p.v.z) * fdt;
+    if (p.boosting) cur.boostT += fdt;
+    cur.jumps = PRESSES.jump - base.jumps; cur.touches = p.stat.touches - base.touches; cur.goals = M.score[0] - base.goals;
+    const tipBefore = stepT > 25; stepT += fdt;
+    if (STEPS[step].done(cur)) { pass = 0.8; Sfx.click(); render(); }
+    else if (tipBefore !== stepT > 25) render();
+  });
+  DEV_HOOKS.push(render);
+  return {
+    start, stop,
+    skip() { finish(); stop(); UI.quick(); },
+    play() { stop(); UI.quick(); },
+    get on() { return on; },
+  };
+})();
+// =====================================================================
 //  UI — title, match setup, garage (upgrades), locker (cosmetics),
 //  how to play, settings, pause, results
 // =====================================================================
@@ -7265,9 +7467,13 @@ const UI = (() => {
           <p class="tagline">Belly-slide soccer with jetpacks</p>
         </div>
         <nav class="title-actions">
-          <button class="btn big" data-go="play" type="button">${UI_PFACE}PLAY</button>
-          <button class="btn blue friends-btn" data-go="online" type="button">PLAY WITH FRIENDS</button>
+          <div class="quick">
+            <button class="btn big" data-quick type="button">${UI_PFACE}PLAY</button>
+            <span class="quick-sub">${save.tutorial ? 'Quick match: 1v1 vs an Easy bot' : 'A 1 minute tutorial, then a 1v1 vs an Easy bot'}</span>
+          </div>
           <div class="row">
+            <button class="btn orange" data-go="play" type="button">Custom match</button>
+            ${PL_OFFLINE ? '' : '<button class="btn violet" data-go="online" type="button">Play with friends</button>'}
             <button class="btn blue" data-go="garage" type="button">Garage</button>
             <button class="btn pink" data-go="locker" type="button">Locker</button>
             <button class="btn green" data-go="howto" type="button">How to play</button>
@@ -7373,15 +7579,16 @@ const UI = (() => {
       el('howto').innerHTML = `
         <div class="topbar">${back()}<h2>How to play</h2></div>
         <div class="sheet">
+          <div class="card"><h3>New here?</h3><p class="panel-note" style="margin:0 0 10px">Drive, boost, jump, hit and score in a quiet rink, one step at a time.</p><button class="btn green" data-tutorial type="button">Play the tutorial</button></div>
           <div class="card"><h3>Keyboard + mouse</h3><div class="keys">
-            <div><kbd>W</kbd><kbd>S</kbd> slide forward / reverse · tilt your nose in the air</div>
-            <div><kbd>A</kbd><kbd>D</kbd> steer · turn in the air</div>
+            <div><kbd>${kl('KeyW')}</kbd><kbd>${kl('KeyS')}</kbd> slide forward / reverse · tilt your nose in the air</div>
+            <div><kbd>${kl('KeyA')}</kbd><kbd>${kl('KeyD')}</kbd> steer · turn in the air</div>
             <div><kbd>Space</kbd> or <kbd>Right click</kbd> jump · press again to double jump</div>
             <div><kbd>Shift</kbd> or <kbd>Left click</kbd> jetpack boost</div>
-            <div><kbd>F</kbd> hold to charge a power shot · steer with <kbd>A</kbd><kbd>D</kbd> as you hit it to curve it</div>
-            <div><kbd>X</kbd> powerslide</div>
-            <div><kbd>C</kbd> ball cam on / off</div>
-            <div><kbd>Tab</kbd> scoreboard · <kbd>Esc</kbd> or <kbd>P</kbd> pause</div>
+            <div><kbd>${kl('KeyF')}</kbd> hold to charge a power shot · steer with <kbd>${kl('KeyA')}</kbd><kbd>${kl('KeyD')}</kbd> as you hit it to curve it</div>
+            <div><kbd>${kl('KeyX')}</kbd> powerslide</div>
+            <div><kbd>${kl('KeyC')}</kbd> ball cam on / off</div>
+            <div><kbd>Tab</kbd> scoreboard · <kbd>${kl('KeyP')}</kbd> or <kbd>Esc</kbd> pause</div>
           </div></div>
           <div class="card"><h3>Gamepad</h3><div class="keys">
             <div><kbd>RT</kbd> / <kbd>LT</kbd> forward / reverse</div><div><kbd>Left stick</kbd> steer and aim in the air</div>
@@ -7464,6 +7671,11 @@ const UI = (() => {
     if (t.dataset.len) { L.len = +t.dataset.len; persist(); Sfx.click(); render.play(); return; }
     if ('fair' in t.dataset) { L.fair = !L.fair; persist(); Sfx.click(); render.play(); return; }
     if ('start' in t.dataset) { Sfx.click(); begin(); return; }
+    if ('quick' in t.dataset) { Sfx.click(); if (save.tutorial) quick(); else Tut.start(); return; }
+    if ('tutorial' in t.dataset) { Sfx.click(); Tut.start(); return; }
+    if ('tutSkip' in t.dataset) { Sfx.click(); Tut.skip(); return; }
+    if ('tutPlay' in t.dataset) { Sfx.click(); Tut.play(); return; }
+    if (t.dataset.harder) { Sfx.click(); launch({ ...M.cfg, opp: t.dataset.harder, mate: M.cfg.mode === '1v1' ? t.dataset.harder : M.cfg.mate }); return; }
     if ('cancel' in t.dataset) { cancelPending(); return; }
     // garage: first click picks the upgrade and opens the confirm step
     if (t.dataset.upg) {
@@ -7521,7 +7733,7 @@ const UI = (() => {
     if ('resume' in t.dataset) { togglePause(); return; }
     if ('restart' in t.dataset) { M.paused = false; show(null); startMatch(M.cfg); $('#hud').hidden = false; return; }
     if ('quit' in t.dataset) { M.paused = false; if (M.online) Online.leave(); toMenu(); return; }
-    if ('again' in t.dataset) { show(null); startMatch(M.cfg); $('#hud').hidden = false; return; }
+    if ('again' in t.dataset) { launch(M.cfg); return; }
     if ('menu' in t.dataset) { if (M.online) Online.leave(); toMenu(); return; }
   });
   document.addEventListener('input', (e) => {
@@ -7529,7 +7741,7 @@ const UI = (() => {
     if (t.id === 'set-fov') { s.fov = +t.value; t.previousElementSibling.querySelector('small').textContent = `${s.fov}° horizontal (pros use 110°)`; }
     else if (t.id === 'set-dist') { s.camDist = +t.value; t.previousElementSibling.querySelector('small').textContent = `${Math.round(s.camDist * 100)}%`; }
     else if (t.id === 'set-shake') { s.camShake = +t.value; t.previousElementSibling.querySelector('small').textContent = `${Math.round(s.camShake * 100)}%`; }
-    else if (t.id === 'set-vol') { s.volume = +t.value; Sfx.init(); Sfx.setVolume(s.volume); t.previousElementSibling.querySelector('small').textContent = `${Math.round(s.volume * 100)}%`; }
+    else if (t.id === 'set-vol') { s.volume = +t.value; Sfx.init(); Sfx.setVolume(); t.previousElementSibling.querySelector('small').textContent = `${Math.round(s.volume * 100)}%`; }
     else return;
     t.style.setProperty('--v', rangePct(+t.value, +t.min, +t.max));
     persist();
@@ -7541,13 +7753,19 @@ const UI = (() => {
   canvas.addEventListener('pointermove', (e) => { if (showroom && showroom.drag) showroom.yaw = showroom.drag.yaw + (e.clientX - showroom.drag.x) * 0.012; });
   canvas.addEventListener('pointerup', () => { if (showroom) showroom.drag = null; });
 
+  // every match starts here. A midgame ad may play first, but only between two matches: never before the
+  // first match of a visit and never in the middle of one (CrazyGames also spaces ads at least 3 minutes apart)
+  let adDue = false;
+  function launch(cfg) {
+    const go = () => { show(null); startMatch(cfg); $('#hud').hidden = false; canvas.focus(); };
+    if (adDue && !cfg.tutorial) { adDue = false; Platform.adBreak(go); } else go();
+  }
   function begin() {
     const L = save.last;
-    show(null);
-    startMatch({ mode: L.mode, opp: L.opp, mate: L.mode === '1v1' ? L.opp : L.mate, len: L.len, fair: L.fair });
-    $('#hud').hidden = false;
-    canvas.focus();
+    launch({ mode: L.mode, opp: L.opp, mate: L.mode === '1v1' ? L.opp : L.mate, len: L.len, fair: L.fair });
   }
+  // Quick Play: one click from the title screen to a short duel against an Easy bot
+  function quick() { launch({ mode: '1v1', opp: 'easy', mate: 'easy', len: 180, fair: false, quick: true }); }
   function toMenu() {
     $('#hud').hidden = true; $('#scoreboard').hidden = true;
     startDemo(); show('title');
@@ -7578,6 +7796,9 @@ const UI = (() => {
     let unlocked = false;
     if (win && cfg.opp === 'god') { save.career.godWins++; if (!save.owned.hat.includes('halo')) { save.owned.hat.push('halo'); unlocked = true; } }
     persist();
+    if (unlocked) Platform.happytime();
+    if (!cfg.online) adDue = true;
+    const next = win && !cfg.online ? LEVEL_ORDER[LEVEL_ORDER.indexOf(cfg.opp) + 1] : null;
     $('#hud').hidden = true;
     el('results').innerHTML = `
       <div class="res-banner ${win ? 'win' : 'lose'}">${win ? 'VICTORY!' : 'DEFEAT'}${UI_LOGO_CAP}</div>
@@ -7586,11 +7807,11 @@ const UI = (() => {
       <div class="table-wrap">${statsTable()}</div>
       <div class="rewards">${parts.map(([n, v]) => `<span class="pill">${esc(n)} +${v}</span>`).join('')}<span class="pill">×${mult.toFixed(2).replace(/\.?0+$/, '')} bonus</span><span class="pill gold">${FISH_SVG}+${fish}</span></div>
       ${unlocked ? '<div class="reward-line" style="margin-top:12px">You beat a God bot. The Halo is now in your locker.</div>' : ''}
-      <div class="res-actions">${cfg.online ? Online.resultButtons() : '<button class="btn green" data-again type="button">Rematch</button><button class="btn blue" data-go="garage" type="button">Garage</button>'}<button class="btn white" data-menu type="button">${cfg.online ? 'Leave room' : 'Main menu'}</button></div>`;
+      <div class="res-actions">${cfg.online ? Online.resultButtons() : `${next ? `<button class="btn green" data-harder="${next}" type="button">Next: ${LEVELS[next].label} bot</button>` : ''}<button class="btn ${next ? 'blue' : 'green'}" data-again type="button">Rematch</button><button class="btn blue" data-go="garage" type="button">Garage</button>`}<button class="btn white" data-menu type="button">${cfg.online ? 'Leave room' : 'Main menu'}</button></div>`;
     show('results');
   }
   const showroomOn = () => cur === 'garage' || cur === 'locker';
-  return { show, togglePause, results, showroomOn, get cur() { return cur; } };
+  return { show, togglePause, results, showroomOn, launch, quick, get cur() { return cur; } };
 })();
 
 function startDemo() {
@@ -7607,8 +7828,9 @@ async function boot() {
   if (renderer.compileAsync) renderer.compileAsync(scene, camera).catch(() => {});
   UI.show('title');
   const ld = $('#loading'); ld.style.transition = 'opacity .5s'; ld.style.opacity = 0; setTimeout(() => { ld.hidden = true; }, 500);
+  Platform.loadingStop();
   requestAnimationFrame((t) => { lastFrame = t; frame(t); });
-  Online.boot();   // ?room=CODE in the address joins a friend's room straight away
+  if (!PL_OFFLINE) Online.boot();   // ?room=CODE in the address joins a friend's room straight away
 }
 addEventListener('resize', resize);
 addEventListener('pointerdown', () => Sfx.init());
@@ -7619,7 +7841,7 @@ boot().catch((err) => {
 });
 // debugging handle (read-only use from the console)
 window.__penguinLeague = {
-  M, A, LEVELS, simTick, startMatch, kickoffReset, save, predictGoal, BALL_R, UI, CAM, scene, camera, renderer, AUTOQ, ballView,
+  M, A, LEVELS, simTick, startMatch, kickoffReset, save, predictGoal, BALL_R, UI, CAM, scene, camera, renderer, AUTOQ, ballView, Platform, Tut,
   drawOnce: (dt = 1 / 60) => tick(dt),
   setView: (px, py, pz, lx, ly, lz) => { CAM.override = { pos: new V3(px, py, pz), look: new V3(lx, ly, lz) }; },
   clearView: () => { CAM.override = null; },
@@ -7632,7 +7854,7 @@ window.__penguinLeague = {
     if (!ld || ld.hidden) return;
     ld.classList.add('err');
     var m = document.getElementById('loading-msg');
-    if (m) m.textContent = 'Penguin League could not start: ' + (e.message || 'unknown error') + '. It needs WebGL and access to cdn.jsdelivr.net.';
+    if (m) m.textContent = 'Penguin League could not start: ' + (e.message || 'unknown error') + '. It needs WebGL' + (window.PL_OFFLINE ? '' : ' and access to cdn.jsdelivr.net') + '.';
   });
 </script>
 

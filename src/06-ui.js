@@ -98,9 +98,13 @@ const UI = (() => {
           <p class="tagline">Belly-slide soccer with jetpacks</p>
         </div>
         <nav class="title-actions">
-          <button class="btn big" data-go="play" type="button">${UI_PFACE}PLAY</button>
-          <button class="btn blue friends-btn" data-go="online" type="button">PLAY WITH FRIENDS</button>
+          <div class="quick">
+            <button class="btn big" data-quick type="button">${UI_PFACE}PLAY</button>
+            <span class="quick-sub">${save.tutorial ? 'Quick match: 1v1 vs an Easy bot' : 'A 1 minute tutorial, then a 1v1 vs an Easy bot'}</span>
+          </div>
           <div class="row">
+            <button class="btn orange" data-go="play" type="button">Custom match</button>
+            ${PL_OFFLINE ? '' : '<button class="btn violet" data-go="online" type="button">Play with friends</button>'}
             <button class="btn blue" data-go="garage" type="button">Garage</button>
             <button class="btn pink" data-go="locker" type="button">Locker</button>
             <button class="btn green" data-go="howto" type="button">How to play</button>
@@ -206,15 +210,16 @@ const UI = (() => {
       el('howto').innerHTML = `
         <div class="topbar">${back()}<h2>How to play</h2></div>
         <div class="sheet">
+          <div class="card"><h3>New here?</h3><p class="panel-note" style="margin:0 0 10px">Drive, boost, jump, hit and score in a quiet rink, one step at a time.</p><button class="btn green" data-tutorial type="button">Play the tutorial</button></div>
           <div class="card"><h3>Keyboard + mouse</h3><div class="keys">
-            <div><kbd>W</kbd><kbd>S</kbd> slide forward / reverse · tilt your nose in the air</div>
-            <div><kbd>A</kbd><kbd>D</kbd> steer · turn in the air</div>
+            <div><kbd>${kl('KeyW')}</kbd><kbd>${kl('KeyS')}</kbd> slide forward / reverse · tilt your nose in the air</div>
+            <div><kbd>${kl('KeyA')}</kbd><kbd>${kl('KeyD')}</kbd> steer · turn in the air</div>
             <div><kbd>Space</kbd> or <kbd>Right click</kbd> jump · press again to double jump</div>
             <div><kbd>Shift</kbd> or <kbd>Left click</kbd> jetpack boost</div>
-            <div><kbd>F</kbd> hold to charge a power shot · steer with <kbd>A</kbd><kbd>D</kbd> as you hit it to curve it</div>
-            <div><kbd>X</kbd> powerslide</div>
-            <div><kbd>C</kbd> ball cam on / off</div>
-            <div><kbd>Tab</kbd> scoreboard · <kbd>Esc</kbd> or <kbd>P</kbd> pause</div>
+            <div><kbd>${kl('KeyF')}</kbd> hold to charge a power shot · steer with <kbd>${kl('KeyA')}</kbd><kbd>${kl('KeyD')}</kbd> as you hit it to curve it</div>
+            <div><kbd>${kl('KeyX')}</kbd> powerslide</div>
+            <div><kbd>${kl('KeyC')}</kbd> ball cam on / off</div>
+            <div><kbd>Tab</kbd> scoreboard · <kbd>${kl('KeyP')}</kbd> or <kbd>Esc</kbd> pause</div>
           </div></div>
           <div class="card"><h3>Gamepad</h3><div class="keys">
             <div><kbd>RT</kbd> / <kbd>LT</kbd> forward / reverse</div><div><kbd>Left stick</kbd> steer and aim in the air</div>
@@ -297,6 +302,11 @@ const UI = (() => {
     if (t.dataset.len) { L.len = +t.dataset.len; persist(); Sfx.click(); render.play(); return; }
     if ('fair' in t.dataset) { L.fair = !L.fair; persist(); Sfx.click(); render.play(); return; }
     if ('start' in t.dataset) { Sfx.click(); begin(); return; }
+    if ('quick' in t.dataset) { Sfx.click(); if (save.tutorial) quick(); else Tut.start(); return; }
+    if ('tutorial' in t.dataset) { Sfx.click(); Tut.start(); return; }
+    if ('tutSkip' in t.dataset) { Sfx.click(); Tut.skip(); return; }
+    if ('tutPlay' in t.dataset) { Sfx.click(); Tut.play(); return; }
+    if (t.dataset.harder) { Sfx.click(); launch({ ...M.cfg, opp: t.dataset.harder, mate: M.cfg.mode === '1v1' ? t.dataset.harder : M.cfg.mate }); return; }
     if ('cancel' in t.dataset) { cancelPending(); return; }
     // garage: first click picks the upgrade and opens the confirm step
     if (t.dataset.upg) {
@@ -354,7 +364,7 @@ const UI = (() => {
     if ('resume' in t.dataset) { togglePause(); return; }
     if ('restart' in t.dataset) { M.paused = false; show(null); startMatch(M.cfg); $('#hud').hidden = false; return; }
     if ('quit' in t.dataset) { M.paused = false; if (M.online) Online.leave(); toMenu(); return; }
-    if ('again' in t.dataset) { show(null); startMatch(M.cfg); $('#hud').hidden = false; return; }
+    if ('again' in t.dataset) { launch(M.cfg); return; }
     if ('menu' in t.dataset) { if (M.online) Online.leave(); toMenu(); return; }
   });
   document.addEventListener('input', (e) => {
@@ -362,7 +372,7 @@ const UI = (() => {
     if (t.id === 'set-fov') { s.fov = +t.value; t.previousElementSibling.querySelector('small').textContent = `${s.fov}° horizontal (pros use 110°)`; }
     else if (t.id === 'set-dist') { s.camDist = +t.value; t.previousElementSibling.querySelector('small').textContent = `${Math.round(s.camDist * 100)}%`; }
     else if (t.id === 'set-shake') { s.camShake = +t.value; t.previousElementSibling.querySelector('small').textContent = `${Math.round(s.camShake * 100)}%`; }
-    else if (t.id === 'set-vol') { s.volume = +t.value; Sfx.init(); Sfx.setVolume(s.volume); t.previousElementSibling.querySelector('small').textContent = `${Math.round(s.volume * 100)}%`; }
+    else if (t.id === 'set-vol') { s.volume = +t.value; Sfx.init(); Sfx.setVolume(); t.previousElementSibling.querySelector('small').textContent = `${Math.round(s.volume * 100)}%`; }
     else return;
     t.style.setProperty('--v', rangePct(+t.value, +t.min, +t.max));
     persist();
@@ -374,13 +384,19 @@ const UI = (() => {
   canvas.addEventListener('pointermove', (e) => { if (showroom && showroom.drag) showroom.yaw = showroom.drag.yaw + (e.clientX - showroom.drag.x) * 0.012; });
   canvas.addEventListener('pointerup', () => { if (showroom) showroom.drag = null; });
 
+  // every match starts here. A midgame ad may play first, but only between two matches: never before the
+  // first match of a visit and never in the middle of one (CrazyGames also spaces ads at least 3 minutes apart)
+  let adDue = false;
+  function launch(cfg) {
+    const go = () => { show(null); startMatch(cfg); $('#hud').hidden = false; canvas.focus(); };
+    if (adDue && !cfg.tutorial) { adDue = false; Platform.adBreak(go); } else go();
+  }
   function begin() {
     const L = save.last;
-    show(null);
-    startMatch({ mode: L.mode, opp: L.opp, mate: L.mode === '1v1' ? L.opp : L.mate, len: L.len, fair: L.fair });
-    $('#hud').hidden = false;
-    canvas.focus();
+    launch({ mode: L.mode, opp: L.opp, mate: L.mode === '1v1' ? L.opp : L.mate, len: L.len, fair: L.fair });
   }
+  // Quick Play: one click from the title screen to a short duel against an Easy bot
+  function quick() { launch({ mode: '1v1', opp: 'easy', mate: 'easy', len: 180, fair: false, quick: true }); }
   function toMenu() {
     $('#hud').hidden = true; $('#scoreboard').hidden = true;
     startDemo(); show('title');
@@ -411,6 +427,9 @@ const UI = (() => {
     let unlocked = false;
     if (win && cfg.opp === 'god') { save.career.godWins++; if (!save.owned.hat.includes('halo')) { save.owned.hat.push('halo'); unlocked = true; } }
     persist();
+    if (unlocked) Platform.happytime();
+    if (!cfg.online) adDue = true;
+    const next = win && !cfg.online ? LEVEL_ORDER[LEVEL_ORDER.indexOf(cfg.opp) + 1] : null;
     $('#hud').hidden = true;
     el('results').innerHTML = `
       <div class="res-banner ${win ? 'win' : 'lose'}">${win ? 'VICTORY!' : 'DEFEAT'}${UI_LOGO_CAP}</div>
@@ -419,11 +438,11 @@ const UI = (() => {
       <div class="table-wrap">${statsTable()}</div>
       <div class="rewards">${parts.map(([n, v]) => `<span class="pill">${esc(n)} +${v}</span>`).join('')}<span class="pill">×${mult.toFixed(2).replace(/\.?0+$/, '')} bonus</span><span class="pill gold">${FISH_SVG}+${fish}</span></div>
       ${unlocked ? '<div class="reward-line" style="margin-top:12px">You beat a God bot. The Halo is now in your locker.</div>' : ''}
-      <div class="res-actions">${cfg.online ? Online.resultButtons() : '<button class="btn green" data-again type="button">Rematch</button><button class="btn blue" data-go="garage" type="button">Garage</button>'}<button class="btn white" data-menu type="button">${cfg.online ? 'Leave room' : 'Main menu'}</button></div>`;
+      <div class="res-actions">${cfg.online ? Online.resultButtons() : `${next ? `<button class="btn green" data-harder="${next}" type="button">Next: ${LEVELS[next].label} bot</button>` : ''}<button class="btn ${next ? 'blue' : 'green'}" data-again type="button">Rematch</button><button class="btn blue" data-go="garage" type="button">Garage</button>`}<button class="btn white" data-menu type="button">${cfg.online ? 'Leave room' : 'Main menu'}</button></div>`;
     show('results');
   }
   const showroomOn = () => cur === 'garage' || cur === 'locker';
-  return { show, togglePause, results, showroomOn, get cur() { return cur; } };
+  return { show, togglePause, results, showroomOn, launch, quick, get cur() { return cur; } };
 })();
 
 function startDemo() {
@@ -440,8 +459,9 @@ async function boot() {
   if (renderer.compileAsync) renderer.compileAsync(scene, camera).catch(() => {});
   UI.show('title');
   const ld = $('#loading'); ld.style.transition = 'opacity .5s'; ld.style.opacity = 0; setTimeout(() => { ld.hidden = true; }, 500);
+  Platform.loadingStop();
   requestAnimationFrame((t) => { lastFrame = t; frame(t); });
-  Online.boot();   // ?room=CODE in the address joins a friend's room straight away
+  if (!PL_OFFLINE) Online.boot();   // ?room=CODE in the address joins a friend's room straight away
 }
 addEventListener('resize', resize);
 addEventListener('pointerdown', () => Sfx.init());
@@ -452,7 +472,7 @@ boot().catch((err) => {
 });
 // debugging handle (read-only use from the console)
 window.__penguinLeague = {
-  M, A, LEVELS, simTick, startMatch, kickoffReset, save, predictGoal, BALL_R, UI, CAM, scene, camera, renderer, AUTOQ, ballView,
+  M, A, LEVELS, simTick, startMatch, kickoffReset, save, predictGoal, BALL_R, UI, CAM, scene, camera, renderer, AUTOQ, ballView, Platform, Tut,
   drawOnce: (dt = 1 / 60) => tick(dt),
   setView: (px, py, pz, lx, ly, lz) => { CAM.override = { pos: new V3(px, py, pz), look: new V3(lx, ly, lz) }; },
   clearView: () => { CAM.override = null; },

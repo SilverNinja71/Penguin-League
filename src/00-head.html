@@ -134,7 +134,8 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:4px so
 @keyframes bob{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(-2.5deg) translateY(-8px)}}
 .title-mid{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:max(5vh,40px)}
 .title-actions{display:flex;flex-direction:column;align-items:center;gap:max(26px,min(30px,4vh));margin-bottom:1vh;padding-top:16px}
-.title-actions .row{display:flex;flex-wrap:wrap;justify-content:center;gap:30px 16px}
+.title-actions .row{display:flex;flex-wrap:wrap;justify-content:center;gap:30px 12px}
+.title-actions .row .btn{padding-left:.8em;padding-right:.8em}
 .career{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .career .stat{background:linear-gradient(180deg,#fff,#dcf2ff);border:3px solid var(--ink);border-radius:12px;padding:6px 12px;font-weight:600;font-size:14px;box-shadow:0 3px 0 var(--ink)}
 .career .stat b{font-family:var(--font-display);font-weight:400;font-size:18px;margin-right:4px}
@@ -338,7 +339,23 @@ table.stats tr.me td{background:rgba(255,226,110,.55);font-weight:700}
 #t-shot{--c1:#c8f6ff;--c2:#2fb8ff;right:calc(34px + env(safe-area-inset-right,0px));bottom:calc(254px + env(safe-area-inset-bottom,0px));width:64px;height:64px;font-size:13px}
 body.touch #boost{bottom:auto;top:calc(76px + env(safe-area-inset-top,0px));width:84px}
 body.touch #charge{bottom:auto;top:calc(172px + env(safe-area-inset-top,0px));width:84px}
-body.touch #hint{display:none}
+body.touch #hint{font-size:12px;line-height:1.5;max-width:min(330px,46vw)}
+#hud.tut #sb-time{font-size:.6em;letter-spacing:.04em}
+/* first-time tutorial card (top centre, under the scorebug) */
+#tut{position:absolute;left:50%;top:calc(98px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:min(430px,calc(100% - 150px));pointer-events:auto;background:var(--frost);border:3px solid var(--ink);border-radius:16px;box-shadow:0 5px 0 var(--ink);padding:9px 14px 12px;text-align:center;font-family:var(--font-body);color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:6px}
+#tut .tut-top{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px}
+#tut .tut-step{font-family:var(--font-display);font-size:13px;letter-spacing:.1em;color:var(--muted)}
+#tut .tut-title{font-family:var(--font-display);font-size:clamp(22px,3vw,30px);line-height:1.05}
+#tut.pass .tut-title{color:var(--lime-deep)}
+#tut .tut-do{font-weight:600;font-size:15px;line-height:1.6}
+#tut .tut-tip{font-weight:600;font-size:13px;line-height:1.5;color:var(--ink-soft)}
+#tut b.o{color:var(--orange-deep)}
+#tut .tut-dots{display:flex;gap:6px;margin-top:2px}
+#tut .tut-dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);background:#fff}
+#tut .tut-dots i.cur{background:var(--sun)}
+#tut .tut-dots i.on{background:var(--lime)}
+#tut.end{gap:8px;padding:12px 16px 16px}
+@media (max-height:520px){#tut{top:calc(70px + env(safe-area-inset-top,0px));padding:6px 10px 8px;gap:3px}#tut .tut-title{font-size:20px}#tut .tut-do{font-size:13px;line-height:1.5}#tut .btn.sm{padding:.5em .7em .4em}}
 body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
 
 /* loading */
@@ -388,7 +405,20 @@ body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
 }
 
 /* Play with friends: lobby */
-.friends-btn{margin-top:10px;font-size:20px;padding:10px 26px}
+.friends-btn{font-size:20px;padding:10px 26px}
+.quick{display:flex;flex-direction:column;align-items:center;gap:42px}   /* clears the icicles under the big button */
+.quick-sub{color:#fff;font-weight:600;font-size:15px;text-shadow:0 1px 0 var(--ink),0 0 6px rgba(18,86,200,.6)}
+/* short screens (CrazyGames' smallest frame is 800x450): everything on the title screen fits without scrolling */
+@media (max-height:560px){
+  #scr-title .topbar{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));width:auto}
+  #scr-title .tagline,#scr-title .career{display:none}
+  .title-mid{margin-top:0}
+  .logo .l1{font-size:min(15vh,12vw)} .logo .l2{font-size:min(12vh,10vw)}
+  .title-actions{gap:12px;padding-top:4px}
+  .title-actions .btn.big{font-size:30px}
+  .quick{gap:40px}
+  .title-actions .row{gap:20px 10px}
+}
 .net-input{font:600 18px var(--font-body);color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:12px;padding:8px 12px;min-width:0;width:min(320px,100%)}
 .net-input.code{width:9ch;text-transform:uppercase;letter-spacing:.2em;font-family:var(--font-display);font-size:22px}
 .net-input.link{flex:1;width:auto;font-size:14px}
@@ -448,7 +478,7 @@ body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
     <div id="charge" aria-hidden="true"><i></i><b>POWER</b></div>
     <div id="hud-left">
       <button id="chip-ballcam" class="hud-chip" type="button" aria-pressed="true">BALL CAM ON · C</button>
-      <div id="hint"><kbd>W A S D</kbd> drive &nbsp;<kbd>Space</kbd> jump/dive &nbsp;<kbd>Shift</kbd> boost<br><kbd>F</kbd> hold for a charged shot &nbsp;<kbd>X</kbd> powerslide &nbsp;<kbd>C</kbd> ball cam &nbsp;<kbd>Esc</kbd> pause</div>
+      <div id="hint"></div>
     </div>
     <button id="btn-pause" type="button" aria-label="Pause"></button>
     <div id="touch" hidden>
@@ -458,6 +488,7 @@ body.touch #hud-left{bottom:calc(192px + env(safe-area-inset-bottom,0px))}
       <div class="tbtn" id="t-slide">SLIDE</div>
       <div class="tbtn" id="t-shot">SHOT</div>
     </div>
+    <div id="tut" hidden></div>
   </div>
   <div id="menu">
     <div id="menu-bg"><div class="snow s1"></div><div class="snow s2"></div></div>

@@ -1,0 +1,15 @@
+<!-- CrazyGames build only (tools/build-crazygames.py puts this right after <title>): the CrazyGames SDK v3,
+     started while the game itself downloads. If it can't load (an ad blocker), the game plays without it. -->
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+<script>
+  window.PL_OFFLINE = true;   // no online rooms: the game talks to no server except CrazyGames' own SDK
+  window.PL_SDK_READY = (async function () {
+    try {
+      var sdk = window.CrazyGames.SDK;
+      await sdk.init();
+      if (sdk.environment === 'disabled') return null;
+      sdk.game.loadingStart();
+      return sdk;
+    } catch (e) { console.warn('CrazyGames SDK unavailable, playing without it:', e); return null; }
+  })();
+</script>

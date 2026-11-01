@@ -6,6 +6,6 @@
     if (!ld || ld.hidden) return;
     ld.classList.add('err');
     var m = document.getElementById('loading-msg');
-    if (m) m.textContent = 'Penguin League could not start: ' + (e.message || 'unknown error') + '. It needs WebGL and access to cdn.jsdelivr.net.';
+    if (m) m.textContent = 'Penguin League could not start: ' + (e.message || 'unknown error') + '. It needs WebGL' + (window.PL_OFFLINE ? '' : ' and access to cdn.jsdelivr.net') + '.';
   });
 </script>
